@@ -7,13 +7,16 @@ from datetime import datetime
 from aiohttp import web
 
 def index(request):
-    return web.Response(body='<h1>Hello World!</h1>')
+    name = request.match_info.get('name', 'World')
+    text = '<h1>Hello, {0} !</h1>'.format(name)
+    return web.Response(body=text)
 
 
 async def init(loop):
     app = web.Application(loop=loop)
 
-    app.router.add_route('GET', '/', index)
+    app.router.add_get('/', index)
+    app.router.add_get('/{name}', index)
 
     srv = await loop.create_server(app.make_handler(), '127.0.0.1', 8003)
 
