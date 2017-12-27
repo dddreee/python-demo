@@ -41,6 +41,7 @@ def init_jinja2(app, **kw):
              env.filters[name] = f
         
     app.__templating__ = env
+    logging.info('  app.__templating__ => %s' % env)
 
 async def logger_factory(app, handler):
     async def logger(request):
@@ -82,12 +83,14 @@ async def response_factory(app, handler):
             return resp
         if isinstance(r, dict):
             template = r.get('__template__')
+            logging.info('  get template => %s' % template)
             if template is None:
                 resp = web.Response(body=json.dumps(r, ensure_ascii=False, default=lambda o: o.__dict__).encode('utf-8'))
                 resp.content_type = 'application/json;charset=utf-8'
                 return resp
             else:
-                resp = web.Response(body=app['__templating__'].get(template).render(**r).encode('utf-8'))
+                
+                resp = web.Response(body=app.__templating__.get_template(template).render(**r).encode('utf-8'))
                 resp.content_type = 'text/html;charset=utf-8'
                 return resp
 
@@ -126,7 +129,7 @@ async def init(loop):
         logger_factory, response_factory
     ])
 
-    init_jinja2(loop, filters=dict(datetime=datetime_filter))
+    init_jinja2(app, filters=dict(datetime=datetime_filter))
     add_routes(app, 'handlers')
     add_static(app)
 
