@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    {% block meta %}<!-- block meta  -->{% endblock %}
+    <title>{% block title %} ? {% endblock %} - Awesome Python Webapp</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.0.10/lib/theme-chalk/index.css">
+    {% block css %}
+    {% endblock %}
+    {% block beforehead %}<!-- before head  -->{% endblock %}
+</head>
+<body>
+
+    <div class="uk-container uk-container-center">
+        <div class="uk-grid">
+            <!-- content -->
+            {% block content %}
+            {% endblock %}
+            <!-- // content -->
+        </div>
+    </div>
+
+    {% include "/global/__script__.html" %}
+
+
+    {% block script %}
+
+    {% endblock %}
+</body>
+</html>

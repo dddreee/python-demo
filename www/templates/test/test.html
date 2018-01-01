@@ -1,0 +1,20 @@
+
+{% extends '/global/__base__.html' %}
+
+{% block title %} 测试 {% endblock %}
+
+{% block content %}
+
+<h1>All users</h1>
+    {% for u in users %}
+    <p>{{ u.name }} / {{ u.email }}</p>
+    {% endfor %}
+
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block script %}
+{% endblock %}
+    
