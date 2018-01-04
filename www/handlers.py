@@ -20,3 +20,15 @@ async def index(request):
         '__template__': './test/test.html',
         'users': users
     }
+
+@get('/test')
+async def test(request):
+    pass
+
+@get('/api/user')
+async def api_get_user():
+    users = await User.findAll()
+    for u in users:
+        u.passwd = '******'
+    
+    return dict(users = users)
