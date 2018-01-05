@@ -14,6 +14,7 @@ from models import User, Comment, Blog, next_id
 
 @get('/')
 async def index(request):
+    logging.info('request => %s' % (request.json()))
     users = await User.findAll()
     logging.info('  users => %s' % users)
     return {
@@ -26,7 +27,7 @@ async def test(request):
     pass
 
 @get('/api/user')
-async def api_get_user():
+async def api_get_user(request):
     users = await User.findAll()
     for u in users:
         u.passwd = '******'
