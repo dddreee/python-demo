@@ -1,6 +1,10 @@
-from netease_handles.util.netease_crypto import *
 
 import requests
 
+
+from ..util.netease_crypto import *
+
+
+
 async def seach_lysrc(request):
-    pass
+    return encrypted_request(request)
