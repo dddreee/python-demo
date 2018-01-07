@@ -12,6 +12,8 @@ from coroweb import get, post
 
 from models import User, Comment, Blog, next_id
 
+from netease_handles.routes import lysrc
+
 @get('/')
 async def index(request):
     logging.info('request => %s' % (request.json()))
@@ -24,7 +26,7 @@ async def index(request):
 
 @get('/test')
 async def test(request):
-    pass
+    print(request)
 
 @get('/api/user')
 async def api_get_user(request):
