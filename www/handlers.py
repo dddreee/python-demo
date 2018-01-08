@@ -12,7 +12,7 @@ from coroweb import get, post
 
 from models import User, Comment, Blog, next_id
 
-from netease_handles.routes import lysrc
+from netease_handles.lysrc import seach_lysrc
 
 @get('/')
 async def index(request):
@@ -24,9 +24,11 @@ async def index(request):
         'users': users
     }
 
-@get('/test')
-async def test(request):
-    print(request)
+@post('/test')
+async def test(*, id):
+    
+    return (await seach_lysrc(id))
+    
 
 @get('/api/user')
 async def api_get_user(request):

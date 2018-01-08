@@ -1,14 +1,18 @@
 
 import requests
+import logging
 import asyncio
 
 
-from util.netease_crypto import *
+from .util.netease_crypto import *
 
 
 
-def seach_lysrc(request):
-    return encrypted_request(request)
+async def seach_lysrc(request, loop):
+    param = encrypted_request(request)
+    logging.info('  data => %s' % param)
+    
+    r = requests.post('https://music.163.com/weapi/song/lyric?csrf_token=', data=param)
+    logging.info('  responese => %s' % r.text)
+    return r.text
 
-# loop = asyncio
-print( seach_lysrc({}))
