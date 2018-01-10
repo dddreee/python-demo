@@ -42,7 +42,7 @@ async def test(*, id):
         }
 
     async with aiohttp.ClientSession() as session:
-        async with session.post('http://music.163.com/weapi/song/lyric?id='+str(id), data=param, headers=headers) as res:
+        async with session.post('http://music.163.com/weapi/song/lyric?csrf_token=&os=osx&lv=-1&kv=-1&tv=-1&id='+str(id), data=param, headers=headers) as res:
             logging.info('  res.text => %s' % (await res.text()))
             # logging.info('  r.status_code => %s' % res.status_code)
             return res.text
