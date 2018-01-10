@@ -8,6 +8,9 @@ import hashlib
 import base64
 import asyncio
 import aiohttp
+from aiohttp import web
+# from aiohttp import web, MultiDict
+import os
 
 from coroweb import get, post
 
@@ -27,7 +30,7 @@ async def index(request):
     }
 
 @get('/test')
-async def test(*, id):
+async def test(*, request, id):
     logging.info('  param id => {}'.format(id))
     param = encrypted_request({})
     headers = {
@@ -43,13 +46,31 @@ async def test(*, id):
 
     async with aiohttp.ClientSession() as session:
         async with session.post('http://music.163.com/weapi/song/lyric?csrf_token=&os=osx&lv=-1&kv=-1&tv=-1&id='+str(id), data=param, headers=headers) as res:
-            logging.info('  res.text => %s' % (await res.text()))
-            # logging.info('  r.status_code => %s' % res.status_code)
-            return res.text
+            data = json.loads(await res.text())
+            
+            lrc = data['lrc']['lyric']
+            res = web.StreamResponse()
+            res.enable_chunked_encoding()
+            await res.prepare(request)
+            with open('31284016.lrc', 'rb') as f:
+                res.write(f.read())
+                await res.drain()
+                return res
 
-    
-    
-    
+            # return data
+            
+            # return web.Response(
+            #     headers = MultiDict({'Content-Disposition': 'Attachment', 'filename': 'test.lrc'}),
+            #     body = lrc.encode('utf-8')
+            # )
+                
+            
+        
+                
+            
+            # logging.info('  r.status_code => %s' % res.status_code)
+            
+
 
 @get('/api/user')
 async def api_get_user(request):
