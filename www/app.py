@@ -18,7 +18,7 @@ from coroweb import add_routes, add_static
 #     return web.Response(body=text)
 
 def init_jinja2(app, **kw):
-    logging.info('init jinja2....')
+    logging.info('  init jinja2....')
     options = dict(
         autoescape = kw.get('autoescape', True),
         block_start_string = kw.get('block_start_string', '{%'),
@@ -31,7 +31,7 @@ def init_jinja2(app, **kw):
 
     if path is None:
         path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-    logging.info('set jinja2 template path %s' % path)
+    logging.info('  set jinja2 template path %s' % path)
 
     env = Environment(loader=FileSystemLoader(path), **options)
     filters = kw.get('filters', None)
@@ -45,7 +45,7 @@ def init_jinja2(app, **kw):
 
 async def logger_factory(app, handler):
     async def logger(request):
-        logging.info('Request: %s %s' % (request.method, request.path))
+        logging.info('  Request: %s %s' % (request.method, request.path))
 
         return (await handler(request))
     return logger
@@ -67,8 +67,9 @@ async def data_factory(app, handler):
 
 async def response_factory(app, handler):
     async def response(request):
-        logging.info('Response handler...')
+        logging.info('  Response handler...')
         r = await handler(request)
+        logging.info('  response in factory => %s' % r)
         if isinstance(r, web.StreamResponse):
             return r
         if isinstance(r, bytes):
@@ -136,7 +137,7 @@ async def init(loop):
 
     srv = await loop.create_server(app.make_handler(), '127.0.0.1', 8003)
 
-    logging.info('server started at http://127.0.0.1:8003....')
+    logging.info('  server started at http://127.0.0.1:8003....')
     return srv
 
 loop = asyncio.get_event_loop()
