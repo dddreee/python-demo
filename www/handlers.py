@@ -18,6 +18,26 @@ from models import User, Comment, Blog, next_id
 
 from netease_handles.util.netease_crypto import encrypted_request
 
+async def netease_request(host, path, method='post', data={}):
+    headers = {
+            'Accept': '*/*',
+            'Accept-Encoding': 'gzip,deflate,sdch',
+            'Accept-Language': 'zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4',
+            'Connection': 'keep-alive',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Host': 'music.163.com',
+            'Referer': 'http://music.163.com/',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36'  # NOQA
+        }
+    url = 'http://%s%s' % (host, path)
+    async with aiohttp.ClientSession() as session:
+        if method == 'post':
+
+            async with session.post(url, data=data, headers=headers) as res:
+                return res
+        elif method == 'get':
+            async with session.get(url, params=data, headers=headers) as res:
+                return res
 
 @get('/')
 async def index(request):
@@ -29,58 +49,47 @@ async def index(request):
         'users': users
     }
 
-@get('/test')
+@get('/api/search_songs')
+async def search_songs(*, keywords, type=1, limit=30, offset=0):
+    request_data = {
+        'csrf_token': '',
+        'limit': limit,
+        'type': type,
+        's': keywords,
+        'offset': offset
+    }
+
+
+@get('/api/download_lrc')
 async def test(*, request, id, name='这是歌词'):
     logging.info('  param id => {}'.format(id))
     param = encrypted_request({})
-    headers = {
-            'Accept': '*/*',
-            'Accept-Encoding': 'gzip,deflate,sdch',
-            'Accept-Language': 'zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4',
-            'Connection': 'keep-alive',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Host': 'music.163.com',
-            'Referer': 'http://music.163.com/',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36'  # NOQA
-        }
+    res = await netease_request(
+        'music.163.com',
+        '/weapi/song/lyric?csrf_token=&os=osx&lv=-1&kv=-1&tv=-1&id=%s' % str(id),
+        'post',
+        param
+        )
+    data = json.loads(await res.text())
+            
+    lrc = data['lrc']['lyric'].encode('utf-8')
+    res = web.StreamResponse()
+    res.content_type = 'application/octet-stream'
+    res.headers['CONTENT-DISPOSITION'] = 'attachment;filename=%s.lrc' % name
 
-    async with aiohttp.ClientSession() as session:
-        async with session.post('http://music.163.com/weapi/song/lyric?csrf_token=&os=osx&lv=-1&kv=-1&tv=-1&id='+str(id), data=param, headers=headers) as res:
-            data = json.loads(await res.text())
-            
-            lrc = data['lrc']['lyric'].encode('utf-8')
-            res = web.StreamResponse()
-            res.content_type = 'application/octet-stream'
-            res.headers['CONTENT-DISPOSITION'] = 'attachment;filename=%s.lrc' % name
-            # res.enable_chunked_encoding()
-            
-            await res.prepare(request)
-            
-            # with open('31284016.lrc', 'rb') as f:
-            res.write(lrc)
-               
-            return res
-            
-
-            # return data
-            
-            # return web.Response(
-            #     headers = MultiDict({'Content-Disposition': 'Attachment', 'filename': 'test.lrc'}),
-            #     body = lrc.encode('utf-8')
-            # )
-
-            # logging.info(os.path.abspath('../31284016.lrc'))
-            # res = web.FileResponse('31284016.lrc')
-            # res.content_type = 'application/octet-stream'
-            # res.headers['Content-Disposition'] = 'Attachment;filename=123.lrc'
-            # return res
-                
-            
+    await res.prepare(request)
+    res.write(lrc)
         
-                
+    return res
+
+
+    # async with aiohttp.ClientSession() as session:
+        # async with session.post('http://music.163.com/weapi/song/lyric?csrf_token=&os=osx&lv=-1&kv=-1&tv=-1&id='+str(id), data=param, headers=headers) as res:
             
-            # logging.info('  r.status_code => %s' % res.status_code)
             
+
+
+
 
 
 @get('/api/user')
