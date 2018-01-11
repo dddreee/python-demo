@@ -30,7 +30,7 @@ async def index(request):
     }
 
 @get('/test')
-async def test(*, request, id):
+async def test(*, request, id, name='这是歌词'):
     logging.info('  param id => {}'.format(id))
     param = encrypted_request({})
     headers = {
@@ -48,14 +48,19 @@ async def test(*, request, id):
         async with session.post('http://music.163.com/weapi/song/lyric?csrf_token=&os=osx&lv=-1&kv=-1&tv=-1&id='+str(id), data=param, headers=headers) as res:
             data = json.loads(await res.text())
             
-            lrc = data['lrc']['lyric']
+            lrc = data['lrc']['lyric'].encode('utf-8')
             res = web.StreamResponse()
-            res.enable_chunked_encoding()
+            res.content_type = 'application/octet-stream'
+            res.headers['CONTENT-DISPOSITION'] = 'attachment;filename=%s.lrc' % name
+            # res.enable_chunked_encoding()
+            
             await res.prepare(request)
-            with open('31284016.lrc', 'rb') as f:
-                res.write(f.read())
-                await res.drain()
-                return res
+            
+            # with open('31284016.lrc', 'rb') as f:
+            res.write(lrc)
+               
+            return res
+            
 
             # return data
             
@@ -63,6 +68,12 @@ async def test(*, request, id):
             #     headers = MultiDict({'Content-Disposition': 'Attachment', 'filename': 'test.lrc'}),
             #     body = lrc.encode('utf-8')
             # )
+
+            # logging.info(os.path.abspath('../31284016.lrc'))
+            # res = web.FileResponse('31284016.lrc')
+            # res.content_type = 'application/octet-stream'
+            # res.headers['Content-Disposition'] = 'Attachment;filename=123.lrc'
+            # return res
                 
             
         
