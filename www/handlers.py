@@ -61,7 +61,7 @@ async def search_songs(*, keywords, type=1, limit=30, offset=0):
 
 
 @get('/api/download_lrc')
-async def test(*, request, id, name='这是歌词'):
+async def download_lrc(*, request, id, name='这是歌词'):
     logging.info('  param id => {}'.format(id))
     param = encrypted_request({})
     res = await netease_request(
@@ -70,23 +70,22 @@ async def test(*, request, id, name='这是歌词'):
         'post',
         param
         )
-    data = json.loads(await res.text())
-            
-    lrc = data['lrc']['lyric'].encode('utf-8')
-    res = web.StreamResponse()
-    res.content_type = 'application/octet-stream'
-    res.headers['CONTENT-DISPOSITION'] = 'attachment;filename=%s.lrc' % name
 
-    await res.prepare(request)
-    res.write(lrc)
+    try:
+        data = json.loads(await res.text())
+            
+        lrc = data['lrc']['lyric'].encode('utf-8')
+        res = web.StreamResponse()
+        res.content_type = 'application/octet-stream'
+        res.headers['CONTENT-DISPOSITION'] = 'attachment;filename=%s.lrc' % name
+
+        await res.prepare(request)
+        res.write(lrc)
+    except KeyError as key_error:
+        logging.warning('   KeyError: %s' % str(key_error) )
         
     return res
-
-
-    # async with aiohttp.ClientSession() as session:
-        # async with session.post('http://music.163.com/weapi/song/lyric?csrf_token=&os=osx&lv=-1&kv=-1&tv=-1&id='+str(id), data=param, headers=headers) as res:
-            
-            
+         
 
 
 
