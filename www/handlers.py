@@ -30,6 +30,11 @@ async def netease_request(host, path, method='post', data={}):
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36'  # NOQA
         }
     url = 'http://%s%s' % (host, path)
+
+    logging.info('  ============ API ==========')
+    logging.info('  %s' % url)
+    
+    
     async with aiohttp.ClientSession() as session:
         if method == 'post':
 
@@ -50,7 +55,7 @@ async def index(request):
     }
 
 @get('/api/search_songs')
-async def search_songs(*, keywords, type=1, limit=30, offset=0):
+async def search_songs(*, keywords, limit=30, type=1, offset=0):
     request_data = {
         'csrf_token': '',
         'limit': limit,
@@ -58,6 +63,21 @@ async def search_songs(*, keywords, type=1, limit=30, offset=0):
         's': keywords,
         'offset': offset
     }
+    logging.info('  ============ REQ ==========')
+    logging.info('  %s' % request_data)
+    param = encrypted_request(request_data)
+
+    res = await netease_request(
+        'music.163.com',
+        '/weapi/search/get',
+        'post',
+        param
+    )
+    data = await res.text()
+    logging.info('  ============ RES ==========')
+    logging.info('  %s' % data)
+    return json.loads(data)
+    
 
 
 @get('/api/download_lrc')
