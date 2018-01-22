@@ -13,6 +13,17 @@ from orm import Model, StringField, BooleanField, FloatFlied, TextField
 def next_id():
     return '%015d%s000' % (int(time.time() * 1000), uuid.uuid4().hex)
 
+class Net_Ease_Lrc(Model):
+    __table__ = 'net_ease_lrc'
+
+    id = StringField(primary_key=True, default=next_id, ddl='varchar(50)')
+    song_id = StringField(ddl="varchar(50)")
+    song_name = StringField(ddl="varchar(50)")
+    singer_name = StringField(ddl="varchar(50)")
+    lrc = StringField(ddl="varchar(3000)")
+    usr_img = StringField(ddl="varchar(50)")
+    cover_img = StringField(ddl="varchar(50)")
+
 class User(Model):
     __table__ = 'users'
 
