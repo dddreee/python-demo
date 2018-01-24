@@ -72,13 +72,17 @@ async def index(request):
     }
 
 @get('/api/search_songs')
-async def search_songs(*, keywords, limit=30, type=1, offset=0):
+async def search_songs(*, keywords, pageSize=30, type=1, page=1):
+    if isinstance(page, str):
+        page = int(page)
+    if isinstance(pageSize, str):
+        pageSize = int(pageSize)
     request_data = {
         'csrf_token': '',
-        'limit': limit,
+        'limit': pageSize,
         'type': type,
         's': keywords,
-        'offset': offset
+        'offset': pageSize*(page - 1)
     }
     logging.info('  ============ REQ ==========')
     logging.info('  %s' % request_data)
@@ -116,19 +120,22 @@ async def download_lrc(*, request, id, name='这是歌词'):
         )
 
     try:
-        data = json.loads(await res.text())
-            
-        lrc = data['lrc']['lyric'].encode('utf-8')
-        res = web.StreamResponse()
-        res.content_type = 'application/octet-stream'
-        res.headers['CONTENT-DISPOSITION'] = 'attachment;filename=%s.lrc' % name
+        data = json.loads(res)
+        if 'nolyric' in data and data['nolyric']:
+            return '没有歌词'
+        else:
 
-        await res.prepare(request)
-        res.write(lrc)
+            lrc = data['lrc']['lyric'].encode('utf-8')
+            resp = web.StreamResponse()
+            resp.content_type = 'application/octet-stream'
+            resp.headers['CONTENT-DISPOSITION'] = 'attachment;filename=%s.lrc' % name
+            await resp.prepare(request)
+            resp.write(lrc)
+            return resp
     except KeyError as key_error:
         logging.warning('   KeyError: %s' % str(key_error) )
         
-    return res
+    
          
 
 
