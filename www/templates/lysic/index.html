@@ -13,9 +13,23 @@
         <!-- search -->
         <el-row>
             <el-col :span="12" :offset="6">
-                <el-input placeholder="请输入内容" v-model="search" class="input-with-select">
+                <!-- 直接使用转换后的html，el-input没有添加keyup事件 -->
+                <div class="input-with-select el-input el-input-group el-input-group--append">
+                    <!---->
+                    <input autocomplete="off" v-model="search" placeholder="请输入内容" type="text" rows="2" validateevent="true" class="el-input__inner" @keyup.enter="searchHandle()">
+                    <!---->
+                    <!---->
+                    <div class="el-input-group__append">
+                        <button type="button" class="el-button el-button--default" @click="searchHandle()">
+                            <!---->
+                            <i class="el-icon-search"></i>
+                            <!---->
+                        </button>
+                    </div>
+                </div>
+                <!-- <el-input placeholder="请输入内容" v-model="search" class="input-with-select" @keyup.enter="searchHandle()">
                     <el-button slot="append" icon="el-icon-search" @click="searchHandle()"></el-button>
-                </el-input>
+                </el-input> -->
             </el-col>
             
         </el-row>
