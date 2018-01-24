@@ -34,24 +34,41 @@ async def netease_request(host, path, method='post', data={}):
     logging.info('  ============ API ==========')
     logging.info('  %s' % url)
     
-    
-    async with aiohttp.ClientSession() as session:
+
+    # session = aiohttp.ClientSession()
+    # res = await session.post(url, data=data, headers=headers)
+    # await session.close()
+    # logging.info('  =========== res ============')
+    # logging.info(' %s' % res.text())
+    # session.close()
+    # return res
+       
+    with aiohttp.ClientSession() as session:
+        logging.info('  method => %s' % method)
         if method == 'post':
 
             async with session.post(url, data=data, headers=headers) as res:
-                return res
+                response_data = await res.text()
+                logging.info('  =========== res ============')
+                logging.info(' %s' % response_data)
+                return response_data
+                # return res
         elif method == 'get':
             async with session.get(url, params=data, headers=headers) as res:
-                return res
+                response_data = await res.text()
+                logging.info('  =========== res ============')
+                logging.info(' %s' % response_data)
+                return response_data
+        
+        return res
 
 @get('/')
 async def index(request):
-    logging.info('request => %s' % (request.json()))
-    users = await User.findAll()
-    logging.info('  users => %s' % users)
+    # logging.info('request => %s' % (request.json()))
+    # users = await User.findAll()
+    # logging.info('  users => %s' % users)
     return {
-        '__template__': './test/test.html',
-        'users': users
+        '__template__': './lysic/index.html'
     }
 
 @get('/api/search_songs')
@@ -73,10 +90,17 @@ async def search_songs(*, keywords, limit=30, type=1, offset=0):
         'post',
         param
     )
-    data = await res.text()
-    logging.info('  ============ RES ==========')
-    logging.info('  %s' % data)
-    return json.loads(data)
+    # loop = asyncio.get_event_loop()
+    # res = loop.run_until_complete(netease_request(
+    #     'music.163.com',
+    #     '/weapi/search/get',
+    #     'post',
+    #     param
+    # ))
+    # data = await res.text()
+    # logging.info('  ============ RES ==========')
+    # logging.info('  %s' % data)
+    return json.loads(res)
     
 
 

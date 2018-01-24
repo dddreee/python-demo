@@ -1,12 +1,33 @@
 <!-- 歌词搜索 -->
+{% extends "/global/__base__.html" %}
 {% block title %}
 网易云音乐歌词下载工具
 {% endblock %}
 
 {% block content %}
+<el-container>
+    <el-header>
+        <h1>[[ title ]]</h1>
+    </el-header>
+    <el-main>
+        <el-row>
+            <el-col :span="12" :offset="6">
+                <el-input placeholder="请输入内容" v-model="search" class="input-with-select">
+                    <el-button slot="append" icon="el-icon-search" @click="searchHandle"></el-button>
+                </el-input>
+            </el-col>
+            
+        </el-row>
 
+        <el-row>
+            <el-col :span="18" :offset="3">
+                
+            </el-col>
+        </el-row>
+    </el-main>
+  </el-container>
 {% endblock %}
 
 {% block script %}
-<script src="index.js"></script>
+<script src="/static/js/lysic/index.js"></script>
 {% endblock %}
