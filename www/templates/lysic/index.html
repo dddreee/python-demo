@@ -1,0 +1,82 @@
+<!-- 歌词搜索 -->
+{% extends "/global/__base__.html" %}
+{% block title %}
+网易云音乐歌词下载
+{% endblock %}
+
+{% block content %}
+<el-container>
+    <el-header>
+        <h1>[[ title ]]</h1>
+    </el-header>
+    <el-main>
+        <!-- search -->
+        <el-row>
+            <el-col :span="12" :offset="6">
+                <!-- 直接使用转换后的html，el-input没有添加keyup事件 -->
+                <div class="input-with-select el-input el-input-group el-input-group--append">
+                    <!---->
+                    <input autocomplete="off" v-model="search" placeholder="请输入内容" type="text" rows="2" validateevent="true" class="el-input__inner" @keyup.enter="searchHandle()">
+                    <!---->
+                    <!---->
+                    <div class="el-input-group__append">
+                        <button type="button" class="el-button el-button--default" @click="searchHandle()">
+                            <!---->
+                            <i class="el-icon-search"></i>
+                            <!---->
+                        </button>
+                    </div>
+                </div>
+                <!-- <el-input placeholder="请输入内容" v-model="search" class="input-with-select" @keyup.enter="searchHandle()">
+                    <el-button slot="append" icon="el-icon-search" @click="searchHandle()"></el-button>
+                </el-input> -->
+            </el-col>
+            
+        </el-row>
+
+        <!-- result table -->
+        <el-row v-show="searchResults.length > 0">
+            <el-col :span="18" :offset="3">
+                <el-table ref="table" :data="searchResults" stripe>
+                    <el-table-column>
+                        <template slot-scope="scope">
+                            <div class="artists">
+                                <a target="_blank" :href="'https://music.163.com/#/song?id=' + scope.row.id">[[ scope.row.name ]]</a>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column>
+                        <template slot-scope="scope">
+                            <div class="artists" v-html="artistsHandle(scope.row)"></div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column>
+                        <template slot-scope="scope">
+                            <el-button size="mini"><a target="_blank" :href="downloadLrc(scope.row)">下载歌词</a></el-button>
+                          </template>
+                    </el-table-column>
+                </el-table>
+            </el-col>
+        </el-row>
+
+        <!-- pagination -->
+        <el-row v-show="params.total > 0">
+            <el-col :span="18" :offset="3" style="margin-top: 30px">
+                    <el-pagination
+                    style="text-align: center"
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page.sync="params.currentPage"
+                    :page-size="params.pageSize"
+                    layout="total, prev, pager, next"
+                    :total="params.total">
+                  </el-pagination>
+            </el-col>
+        </el-row>
+    </el-main>
+  </el-container>
+{% endblock %}
+
+{% block script %}
+<script src="/static/js/lysic/index.js"></script>
+{% endblock %}

@@ -1,0 +1,22 @@
+h1{
+    text-align: center
+}
+
+[v-cloak]{
+    display: none;
+}
+
+a{
+    color: inherit;
+    text-decoration: none;
+}
+a:hover,
+a:active,
+a:link{
+    color: inherit;
+}
+
+.artists a:hover{
+    color: #409EFF;
+    text-decoration: underline #409EFF;
+}
